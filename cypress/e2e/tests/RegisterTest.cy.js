@@ -5,10 +5,17 @@ const ca = new CommonActions()
 const registerPage = new RegisterPage()
 
 describe('Register Page', () => {
-  let dropdownValues = ['Choose...', 'cash on delivery', 'card']
 
   beforeEach(() => {
     cy.visit('https://practice.expandtesting.com/form-validation')
+
+    cy.fixture("pageContent/dropdown.json").then(dropdown => {
+      cy.wrap(dropdown).as("dropdown")
+    })
+
+    cy.fixture("user/userData.json").then((user) => {
+      cy.wrap(user).as("userData")
+    })
   })
 
   it('Verifies that the form cannot be sent with all empty fields', () => {
@@ -22,15 +29,20 @@ describe('Register Page', () => {
 
   it('Verifies that the payment dropdown has options', () => {
     // opens the select dropdown quite alright, but picks the element instead of just verifying it exists
-    ca.verifyDropdownValues(registerPage.register_payment_identifier, dropdownValues)
+    cy.get('@dropdown').then((dropdown) => {
+      ca.verifyDropdownValues(registerPage.register_payment_identifier, dropdown.options)
+    })
+    
   })
 
-  it('Verifies that user is redirected upon sign up', () => {
+  it.only('Verifies that user is redirected upon sign up', () => {
     // enter all form fields
-    registerPage.enterContactName('emy')
     registerPage.enterContactNumber(ca.generateContactNumber())
-    registerPage.enterPickupDate('2025-10-02')
     registerPage.enterPayment(2)
+    cy.get('@userData').then(userData => {
+      registerPage.enterContactName(userData.contactName)
+      registerPage.enterPickupDate(userData.pickupDate)
+    })
 
     // clicks on register button and verifies redirection
     registerPage.clickOnRegisterButton()
@@ -44,9 +56,11 @@ describe('Register Page', () => {
     // enters all fields except the contact name
     registerPage.clearContactName()
     registerPage.enterContactNumber(ca.generateContactNumber())
-    registerPage.enterPickupDate('2025-10-02')
     registerPage.enterPayment(2)
     registerPage.clickOnRegisterButton()
+    cy.get('@userData').then(userData => {
+      registerPage.enterPickupDate(userData.pickupDate)
+    })
     
     // verifies that the error message appears upon register attempt
     ca.verifyWebElementExists(registerPage.invalid_identifier)
