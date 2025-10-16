@@ -11,6 +11,7 @@ export class RegisterPage{
     register_button_identifier = 'button[type="submit"]'
     main_successmessage_identifier = 'div[role="alert"]'
     invalid_identifier = 'div[class="invalid-feedback"]'
+    mainpage_url = '/form-confirmation'
 
     // action methods
     enterContactName(value){
@@ -35,5 +36,9 @@ export class RegisterPage{
 
     clearContactName(){
         ca.clearValueInAField(this.register_contactname_identifier)
+    }
+
+    checkRedirection(){
+        ca.verifyLinkDoesNotRedirect('pathname', this.mainpage_url)
     }
 }

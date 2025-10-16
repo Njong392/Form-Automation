@@ -24,7 +24,7 @@ describe('Register Page', () => {
 
     // click on register button and ensure it redirects
     registerPage.clickOnRegisterButton()
-    ca.verifyLinkDoesNotRedirect('pathname', '/form-confirmation')
+    registerPage.checkRedirection()
   })
 
   it('Verifies that the payment dropdown has options', () => {
@@ -35,7 +35,7 @@ describe('Register Page', () => {
     
   })
 
-  it.only('Verifies that user is redirected upon sign up', () => {
+  it('Verifies that user is redirected upon sign up', () => {
     // enter all form fields
     registerPage.enterContactNumber(ca.generateContactNumber())
     registerPage.enterPayment(2)
@@ -68,8 +68,10 @@ describe('Register Page', () => {
 
   it('Verifies that contact number being empty throws an error', () => {
     // enters all fields except contact number
-    registerPage.enterContactName('emy')
-    registerPage.enterPickupDate('2025-10-02')
+    cy.get('@userData').then(userData => {
+      registerPage.enterContactName(userData.contactName)
+      registerPage.enterPickupDate(userData.pickupDate)
+    })
     registerPage.enterPayment(2)
     registerPage.clickOnRegisterButton()
     ca.verifyWebElementExists(registerPage.invalid_identifier)
@@ -77,7 +79,9 @@ describe('Register Page', () => {
 
   it('Verifies that pickup date being empty throws an error', () => {
     // enters all fields except the pickup date field
-    registerPage.enterContactName('emy')
+    cy.get('@userData').then(userData => {
+      registerPage.enterContactName(userData.contactName)
+    })
     registerPage.enterContactNumber(ca.generateContactNumber())
     registerPage.enterPayment(2)
     registerPage.clickOnRegisterButton()
@@ -87,8 +91,11 @@ describe('Register Page', () => {
 
   it('Verifies that payment being empty throws an error', () => {
     // enters all fields except the the payment method field
-    registerPage.enterContactName('emy')
-     registerPage.enterPickupDate('2025-10-02')
+    cy.get('@userData').then(userData => {
+      registerPage.enterContactName(userData.contactName)
+      registerPage.enterPickupDate(userData.pickupDate)
+    })
+
     registerPage.enterContactNumber(ca.generateContactNumber())
     registerPage.clickOnRegisterButton()
     ca.verifyWebElementExists(registerPage.invalid_identifier)
@@ -96,9 +103,11 @@ describe('Register Page', () => {
 
   it('Verifies that user enters correct Contact number', () => {
      // enter all form fields with incorrect contact number
-    registerPage.enterContactName('emy')
+    cy.get('@userData').then(userData => {
+      registerPage.enterContactName(userData.contactName)
+      registerPage.enterPickupDate(userData.pickupDate)
+    })
     registerPage.enterContactNumber(ca.generateIncorrectContactNumber())
-    registerPage.enterPickupDate('2025-10-02')
     registerPage.enterPayment(2)
 
     // clicks on register button and verifies error message
@@ -109,9 +118,11 @@ describe('Register Page', () => {
 
   // this test case assumes that there is a database and the user exists
   it('Verifies that user can NOT register twice', () => {
-    registerPage.enterContactName('emy')
+    cy.get('@userData').then(userData => {
+      registerPage.enterContactName(userData.contactName)
+      registerPage.enterPickupDate(userData.pickupDate)
+    })
     registerPage.enterContactNumber(ca.generateContactNumber())
-    registerPage.enterPickupDate('2025-10-02')
     registerPage.enterPayment(2)
     registerPage.clickOnRegisterButton()
 
